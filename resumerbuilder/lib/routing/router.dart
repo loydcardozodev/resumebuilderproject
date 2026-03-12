@@ -42,7 +42,7 @@ GoRouter router = GoRouter(
     GoRoute(path: Routes.login, builder: (context, state) => const Login()),
     GoRoute(
       path: Routes.createtemp,
-      builder: (context, state) => const Createtemplate(),
+      builder: (context, state) => const CreateTemplatePage(),
     ),
     GoRoute(
       path: Routes.template,

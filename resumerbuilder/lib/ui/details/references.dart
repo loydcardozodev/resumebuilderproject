@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
 import 'package:resumerbuilder/ui/details/add_section.dart';
 import 'package:resumerbuilder/ui/details/customdrawer.dart';
+import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
+import 'package:resumerbuilder/ui/widget/nav_buttons.dart';
 
 class References extends StatelessWidget {
   const References({super.key});
@@ -10,83 +12,37 @@ class References extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('References')),
-      drawer: CustomDrawer(),
+      appBar: AppBar(title: const Text('References')),
+      drawer: const CustomDrawer(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'List references',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter references'),
-              ),
-              SizedBox(height: 10),
-              AddSection(),
-
-              SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.go(Routes.interest);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.push(Routes.preview);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          children: [
+            const LabeledTextField(
+              label: 'Reference Name',
+              hint: 'Enter full name',
+            ),
+            const LabeledTextField(
+              label: 'Job Title',
+              hint: 'Enter their job title',
+            ),
+            const LabeledTextField(
+              label: 'Company',
+              hint: 'Enter their company',
+            ),
+            const LabeledTextField(label: 'Email', hint: 'Enter their email'),
+            const LabeledTextField(
+              label: 'Phone',
+              hint: 'Enter their phone number',
+            ),
+            const AddSection(),
+            const SizedBox(height: 10),
+            NavButtons(
+              onBack: () => context.go(Routes.interest),
+              onNext: () => context.push(Routes.preview),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

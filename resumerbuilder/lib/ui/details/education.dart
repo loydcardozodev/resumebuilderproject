@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
 import 'package:resumerbuilder/ui/details/add_section.dart';
 import 'package:resumerbuilder/ui/details/customdrawer.dart';
+import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
+import 'package:resumerbuilder/ui/widget/nav_buttons.dart';
 
 class Education extends StatelessWidget {
   const Education({super.key});
@@ -10,143 +12,39 @@ class Education extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Education')),
-      drawer: CustomDrawer(),
+      appBar: AppBar(title: const Text('Education')),
+      drawer: const CustomDrawer(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Education Institute',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          children: [
+            const LabeledTextField(
+              label: 'Education Institute',
+              hint: 'Enter education institute',
+            ),
+            const LabeledTextField(
+              label: 'Qualification',
+              hint: 'Enter qualification',
+            ),
+            Row(
+              children: const [
+                Expanded(
+                  child: LabeledTextField(label: 'Start', hint: 'MM/YYYY'),
                 ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Enter education Institute',
+                SizedBox(width: 10),
+                Expanded(
+                  child: LabeledTextField(label: 'End', hint: 'MM/YYYY'),
                 ),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Qualification',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter Qualification'),
-              ),
-              SizedBox(height: 10),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'Start',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter start',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'End',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter start',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              AddSection(),
-
-              SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.go(Routes.career);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.push(Routes.keySkills);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+              ],
+            ),
+            const AddSection(),
+            const SizedBox(height: 10),
+            NavButtons(
+              onBack: () => context.go(Routes.career),
+              onNext: () => context.push(Routes.keySkills),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
 import 'package:resumerbuilder/ui/details/add_section.dart';
 import 'package:resumerbuilder/ui/details/customdrawer.dart';
+import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
+import 'package:resumerbuilder/ui/widget/nav_buttons.dart';
 
 class Project extends StatelessWidget {
   const Project({super.key});
@@ -10,144 +12,48 @@ class Project extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Project')),
-      drawer: CustomDrawer(),
+      appBar: AppBar(title: const Text('Project')),
+      drawer: const CustomDrawer(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Project title',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter project title'),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Project description',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Enter project description',
-                ),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Project features',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter project feature'),
-              ),
-              SizedBox(height: 10),
-              AddSection(),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Technology used',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter Technology used'),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Github link',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter github link'),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Live link',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter live link'),
-              ),
-
-              SizedBox(height: 10),
-
-              AddSection(),
-
-              SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.go(Routes.keySkills);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.push(Routes.interest);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          children: [
+            const LabeledTextField(
+              label: 'Project Title',
+              hint: 'Enter project title',
+            ),
+            const LabeledTextField(
+              label: 'Project Description',
+              hint: 'Enter project description',
+              maxLines: 3,
+            ),
+            const LabeledTextField(
+              label: 'Project Features',
+              hint: 'Enter project features',
+              maxLines: 3,
+            ),
+            const AddSection(),
+            const SizedBox(height: 10),
+            const LabeledTextField(
+              label: 'Technology Used',
+              hint: 'e.g. Flutter, Firebase, REST API',
+            ),
+            const LabeledTextField(
+              label: 'GitHub Link',
+              hint: 'https://github.com/username/repo',
+            ),
+            const LabeledTextField(
+              label: 'Live Link',
+              hint: 'https://yourapp.com',
+            ),
+            const AddSection(),
+            const SizedBox(height: 10),
+            NavButtons(
+              onBack: () => context.go(Routes.keySkills),
+              onNext: () => context.push(Routes.interest),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
 import 'package:resumerbuilder/ui/details/add_section.dart';
 import 'package:resumerbuilder/ui/details/customdrawer.dart';
+import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
+import 'package:resumerbuilder/ui/widget/nav_buttons.dart';
 
 class Career extends StatelessWidget {
   const Career({super.key});
@@ -10,163 +12,35 @@ class Career extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Experience')),
-      drawer: CustomDrawer(),
+      appBar: AppBar(title: const Text('Experience')),
+      drawer: const CustomDrawer(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Job Title',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          children: [
+            const LabeledTextField(label: 'Job Title', hint: 'Enter job title'),
+            const LabeledTextField(label: 'Company', hint: 'Enter company'),
+            const LabeledTextField(label: 'Location', hint: 'Enter location'),
+            const LabeledTextField(label: 'Job Details', hint: 'Enter details'),
+            Row(
+              children: const [
+                Expanded(
+                  child: LabeledTextField(label: 'Start', hint: 'MM/YYYY'),
                 ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter job title'),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Company',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                SizedBox(width: 10),
+                Expanded(
+                  child: LabeledTextField(label: 'End', hint: 'MM/YYYY'),
                 ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter comapny'),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Location',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter location'),
-              ),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Job Details',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Enter details'),
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'Start',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter start',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'End',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter start',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              AddSection(),
-
-              SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.go(Routes.personalData);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.push(Routes.education);
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+              ],
+            ),
+            const AddSection(),
+            const SizedBox(height: 10),
+            NavButtons(
+              onBack: () => context.go(Routes.personalData),
+              onNext: () => context.push(Routes.education),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

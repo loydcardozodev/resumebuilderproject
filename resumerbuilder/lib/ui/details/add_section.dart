@@ -5,21 +5,18 @@ class AddSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        border: Border.all(color: Colors.deepPurple),
+    return OutlinedButton.icon(
+      onPressed: () {}, // hook up callback when ready
+      icon: const Icon(Icons.add, color: Colors.deepPurple),
+      label: const Text(
+        'Add more section',
+        style: TextStyle(color: Colors.deepPurple),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add, color: Colors.deepPurple),
-          SizedBox(height: 30),
-          Text('Add more section', style: TextStyle(color: Colors.deepPurple)),
-        ],
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size.fromHeight(50),
+        backgroundColor: Colors.grey[300],
+        side: const BorderSide(color: Colors.deepPurple),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
