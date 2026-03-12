@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:resumerbuilder/firebase_options.dart';
-import 'package:resumerbuilder/routing/routes.dart';
+import 'package:resumerbuilder/config/app_config.dart';
 import 'package:resumerbuilder/routing/router.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:resumerbuilder/flavor/main_development.dart' as dev;
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+void main() => dev.main();
 
-  runApp(const MyApp());
-}
+class MainApp extends StatelessWidget {
+  const MainApp({super.key, required this.config});
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppConfig config;
 
   @override
   Widget build(BuildContext context) {
