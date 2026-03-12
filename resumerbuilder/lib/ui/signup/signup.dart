@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
+import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -11,130 +12,256 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
+  String? _errorMessage;
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<bool> createUserWithEmailAndPassword() async {
+  Future<void> _signup() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
-      final userCredential = await FirebaseAuth.instance
+      final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
           );
-      print(userCredential.user?.uid);
-      return true;
+      debugPrint('User created: ${credential.user?.uid}');
+      if (mounted) context.go(Routes.home);
     } on FirebaseAuthException catch (e) {
-      print(e.message);
-      return false;
+      setState(() => _errorMessage = _mapFirebaseError(e.code));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  String _mapFirebaseError(String code) {
+    switch (code) {
+      case 'email-already-in-use':
+        return 'An account already exists for this email.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'weak-password':
+        return 'Password is too weak. Use at least 6 characters.';
+      case 'operation-not-allowed':
+        return 'Email/password sign up is not enabled.';
+      default:
+        return 'Sign up failed. Please try again.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(
-        key: _formKey,
-
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-
-          child: Column(
-            children: [
-              SizedBox(height: 100),
-
-              Center(
-                child: Text(
-                  'Sign Up',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 32),
+                const Text(
+                  'Create Account',
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
-              ),
-
-              const SizedBox(height: 10),
-
-              _buildLabel("Email"),
-              _buildTextField("Enter address", controller: emailController),
-
-              SizedBox(height: 20),
-
-              _buildLabel("Password"),
-              _buildTextField("Enter address", controller: passwordController),
-
-              SizedBox(height: 20),
-
-              GestureDetector(
-                onTap: () async {
-                  bool success = await createUserWithEmailAndPassword();
-
-                  if (success) {
-                    context.go(Routes.home);
-                  }
-                },
-                child: Container(
-                  height: 50,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Sign up',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Fill in the details below to get started',
+                  style: TextStyle(color: Colors.grey),
                 ),
-              ),
+                const SizedBox(height: 40),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Already have an account.',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                // Email
+                LabeledTextField(
+                  label: 'Email',
+                  hint: 'Enter your email',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return 'Email is required';
+                    }
+                    if (!RegExp(
+                      r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(v.trim())) {
+                      return 'Enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 4),
+
+                // Password
+                LabeledTextField(
+                  label: 'Password',
+                  hint: 'Create a password',
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Password is required';
+                    if (v.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    if (!RegExp(r'(?=.*[A-Z])').hasMatch(v)) {
+                      return 'Include at least one uppercase letter';
+                    }
+                    if (!RegExp(r'(?=.*\d)').hasMatch(v)) {
+                      return 'Include at least one number';
+                    }
+                    return null;
+                  },
+                ),
 
-                  TextButton(
-                    onPressed: () {
-                      context.push(Routes.login);
-                    },
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(color: Colors.blue),
+                const SizedBox(height: 4),
+
+                // Confirm password
+                LabeledTextField(
+                  label: 'Confirm Password',
+                  hint: 'Re-enter your password',
+                  controller: _confirmPasswordController,
+                  obscureText: _obscureConfirm,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirm
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscureConfirm = !_obscureConfirm),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) {
+                      return 'Please confirm your password';
+                    }
+                    if (v != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+
+                // Error banner
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red.shade700,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(color: Colors.red.shade700),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ],
+
+                const SizedBox(height: 32),
+
+                // Sign up button
+                SizedBox(
+                  height: 52,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _signup,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade400,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Create Account',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Login link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Already have an account?'),
+                    TextButton(
+                      onPressed: () => context.push(Routes.login),
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
-    );
-  }
-
-  Widget _buildTextField(
-    String hint, {
-    int maxLines = 1,
-    required TextEditingController controller,
-  }) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(hintText: hint),
     );
   }
 }
