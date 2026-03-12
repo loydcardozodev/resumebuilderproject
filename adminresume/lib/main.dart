@@ -1,23 +1,20 @@
-import 'package:adminresume/firebase_options.dart';
-import 'package:adminresume/ui/dashboard.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:adminresume/config/app_config.dart';
+import 'package:adminresume/routing/router.dart';
 import 'package:flutter/material.dart';
+import 'package:adminresume/flavor/main_development.dart' as dev;
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
-}
+void main() => dev.main();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key, required this.config});
 
-  // This widget is the root of your application.
+  final AppConfig config;
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: const Dashboard(),
+      routerConfig: router,
     );
   }
 }
