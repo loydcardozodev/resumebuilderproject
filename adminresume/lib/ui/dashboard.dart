@@ -1,8 +1,8 @@
-import 'package:adminresume/ui/login.dart';
-import 'package:adminresume/ui/signup.dart';
+import 'package:adminresume/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:adminresume/ui/template_management.dart';
 import 'package:adminresume/ui/user_management.dart';
+import 'package:go_router/go_router.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -118,20 +118,14 @@ class DashboardHome extends StatelessWidget {
               children: [
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Signup()),
-                    );
+                    context.push(Routes.signup);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text("Sign up"),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Login()),
-                    );
+                    context.push(Routes.login);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text("Login"),

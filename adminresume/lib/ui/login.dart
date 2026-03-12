@@ -1,5 +1,7 @@
 // import 'package:firebase_auth/firebase_auth.dart';
+import 'package:adminresume/routing/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 
 class Login extends StatefulWidget {
@@ -105,7 +107,7 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         onPressed: () {
-                          // Call login function
+                          context.push(Routes.login);
                         },
                         child: const Text(
                           "Sign In",
@@ -126,7 +128,7 @@ class _LoginState extends State<Login> {
                         ),
                         TextButton(
                           onPressed: () {
-                            // Navigate to signup
+                            context.push(Routes.signup);
                           },
                           child: const Text("Sign Up"),
                         ),
