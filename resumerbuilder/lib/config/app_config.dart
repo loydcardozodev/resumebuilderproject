@@ -14,7 +14,6 @@ class AppConfig {
   final Level logLevel;
 
   bool get isDevelopment => flavor == AppFlavor.development;
-
   bool get useFirebase => flavor == AppFlavor.firebase;
 
   static const firebase = AppConfig(

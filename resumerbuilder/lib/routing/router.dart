@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
-import 'package:resumerbuilder/ui/createtemplate/createTemplate.dart';
+import 'package:resumerbuilder/ui/createtemplate/view/createTemplate.dart';
 import 'package:resumerbuilder/ui/details/career.dart';
 import 'package:resumerbuilder/ui/details/education.dart';
 import 'package:resumerbuilder/ui/details/interest.dart';
@@ -13,7 +13,7 @@ import 'package:resumerbuilder/ui/details/references.dart';
 import 'package:resumerbuilder/ui/home/home_screen.dart';
 import 'package:resumerbuilder/ui/login/login.dart';
 import 'package:resumerbuilder/ui/preview/resumepreview.dart';
-import 'package:resumerbuilder/ui/profile/profile.dart';
+import 'package:resumerbuilder/ui/profile/view/profile.dart';
 import 'package:resumerbuilder/ui/signup/signup.dart';
 import 'package:resumerbuilder/ui/template/template.dart';
 
