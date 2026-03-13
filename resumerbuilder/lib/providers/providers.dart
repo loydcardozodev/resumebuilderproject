@@ -18,7 +18,10 @@ import 'package:resumerbuilder/data/services/local/local_auth_service.dart';
 import 'package:resumerbuilder/data/services/local/local_profile_service.dart';
 import 'package:resumerbuilder/data/services/local/local_resume_service.dart';
 import 'package:resumerbuilder/data/services/local/local_template_service.dart';
+import 'package:resumerbuilder/ui/createtemplate/viewmodel/template_viewmodel.dart';
+import 'package:resumerbuilder/ui/profile/viewmodel/profile_viewmodel.dart';
 import 'package:resumerbuilder/ui/viewmodel/auth_viewmodel.dart';
+import 'package:resumerbuilder/ui/viewmodel/resume_draft_viewmodel.dart';
 
 List<SingleChildWidget> buildProviders(AppConfig config) {
   return config.useFirebase ? _firebaseProviders() : _localProviders();
@@ -47,14 +50,11 @@ List<SingleChildWidget> _firebaseProviders() {
     ChangeNotifierProvider<AuthViewModel>(
       create: (_) => AuthViewModel(authRepo),
     ),
-    ChangeNotifierProxyProvider<AuthViewModel, ProfileViewModel>(
+    ChangeNotifierProvider<ProfileViewModel>(
       create: (_) => ProfileViewModel(authRepo, profileService),
-      update: (_, auth, prev) =>
-          prev ?? ProfileViewModel(authRepo, profileService),
     ),
-    ChangeNotifierProxyProvider<AuthViewModel, ResumeViewModel>(
-      create: (_) => ResumeViewModel(resumeRepo),
-      update: (_, auth, prev) => prev ?? ResumeViewModel(resumeRepo),
+    ChangeNotifierProvider<ResumeDraftViewModel>(
+      create: (_) => ResumeDraftViewModel(resumeRepo),
     ),
     ChangeNotifierProvider<TemplateViewModel>(
       create: (_) => TemplateViewModel(templateRepo),
@@ -85,14 +85,11 @@ List<SingleChildWidget> _localProviders() {
     ChangeNotifierProvider<AuthViewModel>(
       create: (_) => AuthViewModel(authRepo),
     ),
-    ChangeNotifierProxyProvider<AuthViewModel, ProfileViewModel>(
+    ChangeNotifierProvider<ProfileViewModel>(
       create: (_) => ProfileViewModel(authRepo, profileService),
-      update: (_, auth, prev) =>
-          prev ?? ProfileViewModel(authRepo, profileService),
     ),
-    ChangeNotifierProxyProvider<AuthViewModel, ResumeViewModel>(
-      create: (_) => ResumeViewModel(resumeRepo),
-      update: (_, auth, prev) => prev ?? ResumeViewModel(resumeRepo),
+    ChangeNotifierProvider<ResumeDraftViewModel>(
+      create: (_) => ResumeDraftViewModel(resumeRepo),
     ),
     ChangeNotifierProvider<TemplateViewModel>(
       create: (_) => TemplateViewModel(templateRepo),
