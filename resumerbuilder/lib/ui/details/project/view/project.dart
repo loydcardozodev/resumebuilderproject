@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:resumerbuilder/routing/routes.dart';
-import 'package:resumerbuilder/ui/details/add_section.dart';
-import 'package:resumerbuilder/ui/details/customdrawer.dart';
+import 'package:resumerbuilder/ui/details/widget/add_section.dart';
+import 'package:resumerbuilder/ui/details/widget/customdrawer.dart';
 import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
 import 'package:resumerbuilder/ui/widget/nav_buttons.dart';
 

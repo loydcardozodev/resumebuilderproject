@@ -1,13 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:resumerbuilder/routing/routes.dart';
+import 'package:provider/provider.dart';
 import 'package:resumerbuilder/config/assets.dart';
+import 'package:resumerbuilder/data/models/resume/resume.dart';
+import 'package:resumerbuilder/routing/routes.dart';
+import 'package:resumerbuilder/ui/home/viewmodel/home_viewmodel.dart';
+import 'package:resumerbuilder/ui/viewmodel/auth_viewmodel.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  // Swap with real data later
-  static const int _resumeCount = 10;
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    final uid = context.read<AuthViewModel>().currentUser?.uid;
+    if (uid == null) return;
+    await context.read<HomeViewModel>().loadResumes(uid);
+  }
+
+  Future<void> _deleteResume(String resumeId) async {
+    final uid = context.read<AuthViewModel>().currentUser?.uid;
+    if (uid == null) return;
+    await context.read<HomeViewModel>().deleteResume(uid, resumeId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +51,38 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _CreateResumeCard(onTap: () => context.push(Routes.createtemp)),
-            const SizedBox(height: 24),
-            const Text(
-              'My Resumes',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      body: Consumer<HomeViewModel>(
+        builder: (context, vm, _) {
+          // ── Loading ───────────────────────────────────────────────────────
+          if (vm.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // ── Error ─────────────────────────────────────────────────────────
+          if (vm.error != null) {
+            return _ErrorState(message: vm.error!.toString(), onRetry: _load);
+          }
+
+          // ── Content ───────────────────────────────────────────────────────
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _CreateResumeCard(onTap: () => context.push(Routes.createtemp)),
+                const SizedBox(height: 24),
+                const Text(
+                  'My Resumes',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                vm.resumes.isEmpty
+                    ? const _EmptyResumes()
+                    : _ResumeGrid(resumes: vm.resumes, onDelete: _deleteResume),
+              ],
             ),
-            const SizedBox(height: 12),
-            _resumeCount == 0
-                ? const _EmptyResumes()
-                : _ResumeGrid(count: _resumeCount),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -115,36 +154,72 @@ class _CreateResumeCard extends StatelessWidget {
 // ── Resume Grid ───────────────────────────────────────────────────────────────
 
 class _ResumeGrid extends StatelessWidget {
-  final int count;
-  const _ResumeGrid({required this.count});
+  final List<Resume> resumes;
+  final Future<void> Function(String resumeId) onDelete;
+
+  const _ResumeGrid({required this.resumes, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: count,
+      itemCount: resumes.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        childAspectRatio: 0.72, // portrait ratio, like a real resume page
+        childAspectRatio: 0.72,
       ),
-      itemBuilder: (context, index) => _ResumeGridItem(index: index),
+      itemBuilder: (context, index) => _ResumeGridItem(
+        resume: resumes[index],
+        index: index,
+        onDelete: onDelete,
+      ),
     );
   }
 }
 
 class _ResumeGridItem extends StatelessWidget {
+  final Resume resume;
   final int index;
-  const _ResumeGridItem({required this.index});
+  final Future<void> Function(String resumeId) onDelete;
+
+  const _ResumeGridItem({
+    required this.resume,
+    required this.index,
+    required this.onDelete,
+  });
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Resume'),
+        content: const Text('Are you sure you want to delete this resume?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && resume.id != null) {
+      await onDelete(resume.id!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // context.push(Routes.preview, extra: index);
-      },
+      onTap: () => context.push(Routes.preview),
+      onLongPress: () => _confirmDelete(context),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[300],
@@ -178,13 +253,17 @@ class _ResumeGridItem extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Resume ${index + 1}',
+                resume.personalInfo.name.isNotEmpty
+                    ? resume.personalInfo.name
+                    : 'Resume ${index + 1}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -220,6 +299,47 @@ class _EmptyResumes extends StatelessWidget {
             Text(
               'Tap "Create CV" to get started',
               style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Error State ───────────────────────────────────────────────────────────────
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 52, color: Colors.grey),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: onRetry,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('Retry'),
             ),
           ],
         ),

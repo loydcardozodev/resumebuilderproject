@@ -6,7 +6,7 @@ class AddSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () {}, // hook up callback when ready
+      onPressed: () {},
       icon: const Icon(Icons.add, color: Colors.deepPurple),
       label: const Text(
         'Add more section',
