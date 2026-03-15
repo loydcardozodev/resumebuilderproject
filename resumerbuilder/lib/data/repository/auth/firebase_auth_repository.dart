@@ -1,7 +1,7 @@
 import 'package:resumerbuilder/data/models/app_user/app_user.dart';
 import 'package:resumerbuilder/data/repository/auth/auth_repository.dart';
 import 'package:resumerbuilder/data/services/firebase/firebase_auth_service.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({required FirebaseAuthService service})
@@ -25,9 +25,9 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       final user = await _service.login(email, password);
       _currentUser = user;
-      return Success(user);
-    } catch (e) {
-      return Failure(e.toString());
+      return Result.ok(user);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
   }
 
@@ -44,9 +44,9 @@ class FirebaseAuthRepository implements AuthRepository {
         name: name,
       );
       _currentUser = user;
-      return Success(user);
-    } catch (e) {
-      return Failure(e.toString());
+      return Result.ok(user);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
   }
 
@@ -59,9 +59,9 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       await _service.updateProfile(uid: uid, name: name, email: email);
       _currentUser = _currentUser?.copyWith(name: name, email: email);
-      return const Success(null);
-    } catch (e) {
-      return Failure(e.toString());
+      return const Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
   }
 
@@ -70,9 +70,9 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       await _service.logout();
       _currentUser = null;
-      return const Success(null);
-    } catch (e) {
-      return Failure(e.toString());
+      return const Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
   }
 
@@ -81,9 +81,9 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       await _service.deleteAccount(uid);
       _currentUser = null;
-      return const Success(null);
-    } catch (e) {
-      return Failure(e.toString());
+      return const Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
   }
 }

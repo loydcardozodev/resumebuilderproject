@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:resumerbuilder/routing/routes.dart';
+import 'package:resumerbuilder/ui/login/login_viewmodel.dart';
 import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
 
 class Login extends StatefulWidget {
@@ -15,10 +16,7 @@ class _LoginState extends State<Login> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
-  bool _isLoading = false;
   bool _obscurePassword = true;
-  String? _errorMessage;
 
   @override
   void dispose() {
@@ -27,46 +25,21 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _login(LoginViewModel viewModel) async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    final success = await viewModel.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      if (mounted) context.go(Routes.home);
-    } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _mapFirebaseError(e.code));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  String _mapFirebaseError(String code) {
-    switch (code) {
-      case 'user-not-found':
-        return 'No account found for this email.';
-      case 'wrong-password':
-        return 'Incorrect password. Please try again.';
-      case 'invalid-email':
-        return 'Please enter a valid email address.';
-      case 'user-disabled':
-        return 'This account has been disabled.';
-      case 'too-many-requests':
-        return 'Too many attempts. Please try again later.';
-      default:
-        return 'Login failed. Please try again.';
-    }
+    if (success && mounted) context.go(Routes.home);
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<LoginViewModel>();
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -88,7 +61,6 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 40),
 
-                // Email
                 LabeledTextField(
                   label: 'Email',
                   hint: 'Enter your email',
@@ -98,9 +70,8 @@ class _LoginState extends State<Login> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Email is required';
                     }
-                    if (!RegExp(
-                      r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    ).hasMatch(value.trim())) {
+                    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value.trim())) {
                       return 'Enter a valid email';
                     }
                     return null;
@@ -109,7 +80,6 @@ class _LoginState extends State<Login> {
 
                 const SizedBox(height: 16),
 
-                // Password
                 LabeledTextField(
                   label: 'Password',
                   hint: 'Enter your password',
@@ -135,8 +105,7 @@ class _LoginState extends State<Login> {
                   },
                 ),
 
-                // Error message
-                if (_errorMessage != null) ...[
+                if (viewModel.errorMessage != null) ...[
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
@@ -151,15 +120,12 @@ class _LoginState extends State<Login> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: Colors.red.shade700,
-                          size: 18,
-                        ),
+                        Icon(Icons.error_outline,
+                            color: Colors.red.shade700, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            _errorMessage!,
+                            viewModel.errorMessage!,
                             style: TextStyle(color: Colors.red.shade700),
                           ),
                         ),
@@ -170,12 +136,12 @@ class _LoginState extends State<Login> {
 
                 const SizedBox(height: 32),
 
-                // Sign In button
                 SizedBox(
                   height: 52,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
+                    onPressed:
+                    viewModel.isLoading ? null : () => _login(viewModel),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
@@ -184,28 +150,27 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: _isLoading
+                    child: viewModel.isLoading
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                         : const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
-                // Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

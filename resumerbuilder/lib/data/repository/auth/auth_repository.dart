@@ -1,5 +1,5 @@
 import 'package:resumerbuilder/data/models/app_user/app_user.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 abstract class AuthRepository {
   AppUser? get currentUser;

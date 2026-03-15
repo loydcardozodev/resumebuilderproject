@@ -19,6 +19,7 @@ import 'package:resumerbuilder/data/services/local/local_profile_service.dart';
 import 'package:resumerbuilder/data/services/local/local_resume_service.dart';
 import 'package:resumerbuilder/data/services/local/local_template_service.dart';
 import 'package:resumerbuilder/ui/createtemplate/viewmodel/template_viewmodel.dart';
+import 'package:resumerbuilder/ui/login/login_viewmodel.dart';
 import 'package:resumerbuilder/ui/profile/viewmodel/profile_viewmodel.dart';
 import 'package:resumerbuilder/ui/viewmodel/auth_viewmodel.dart';
 import 'package:resumerbuilder/ui/viewmodel/resume_draft_viewmodel.dart';
@@ -49,6 +50,9 @@ List<SingleChildWidget> _firebaseProviders() {
     Provider<TemplateRepository>.value(value: templateRepo),
     ChangeNotifierProvider<AuthViewModel>(
       create: (_) => AuthViewModel(authRepo),
+    ),
+    ChangeNotifierProvider<LoginViewModel>(
+      create: (_) => LoginViewModel(authRepository: authRepo),
     ),
     ChangeNotifierProvider<ProfileViewModel>(
       create: (_) => ProfileViewModel(authRepo, profileService),
@@ -84,6 +88,9 @@ List<SingleChildWidget> _localProviders() {
     Provider<TemplateRepository>.value(value: templateRepo),
     ChangeNotifierProvider<AuthViewModel>(
       create: (_) => AuthViewModel(authRepo),
+    ),
+    ChangeNotifierProvider<LoginViewModel>(
+      create: (_) => LoginViewModel(authRepository: authRepo),
     ),
     ChangeNotifierProvider<ProfileViewModel>(
       create: (_) => ProfileViewModel(authRepo, profileService),

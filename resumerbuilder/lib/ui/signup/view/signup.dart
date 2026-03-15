@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:resumerbuilder/routing/routes.dart';
+import 'package:resumerbuilder/ui/signup/viewmodel/signup_viewmodel.dart';
 import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
 
 class Signup extends StatefulWidget {
@@ -12,64 +13,28 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
-  String? _errorMessage;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _signup() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-          );
-      debugPrint('User created: ${credential.user?.uid}');
-      if (mounted) context.go(Routes.home);
-    } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _mapFirebaseError(e.code));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  String _mapFirebaseError(String code) {
-    switch (code) {
-      case 'email-already-in-use':
-        return 'An account already exists for this email.';
-      case 'invalid-email':
-        return 'Please enter a valid email address.';
-      case 'weak-password':
-        return 'Password is too weak. Use at least 6 characters.';
-      case 'operation-not-allowed':
-        return 'Email/password sign up is not enabled.';
-      default:
-        return 'Sign up failed. Please try again.';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<SignupViewModel>();
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -90,6 +55,22 @@ class _SignupState extends State<Signup> {
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 40),
+
+                // Name
+                LabeledTextField(
+                  label: 'Full Name',
+                  hint: 'Enter your full name',
+                  controller: _nameController,
+                  keyboardType: TextInputType.name,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return 'Name is required';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 4),
 
                 // Email
                 LabeledTextField(
@@ -171,7 +152,7 @@ class _SignupState extends State<Signup> {
                 ),
 
                 // Error banner
-                if (_errorMessage != null) ...[
+                if (viewModel.errorMessage != null) ...[
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
@@ -194,7 +175,7 @@ class _SignupState extends State<Signup> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            _errorMessage!,
+                            viewModel.errorMessage!,
                             style: TextStyle(color: Colors.red.shade700),
                           ),
                         ),
@@ -210,7 +191,17 @@ class _SignupState extends State<Signup> {
                   height: 52,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _signup,
+                    onPressed: viewModel.isLoading
+                        ? null
+                        : () async {
+                            if (!_formKey.currentState!.validate()) return;
+                            final success = await viewModel.signup(
+                              email: _emailController.text.trim(),
+                              password: _passwordController.text.trim(),
+                              name: _nameController.text.trim(),
+                            );
+                            if (success && mounted) context.go(Routes.home);
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
@@ -219,7 +210,7 @@ class _SignupState extends State<Signup> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: _isLoading
+                    child: viewModel.isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
