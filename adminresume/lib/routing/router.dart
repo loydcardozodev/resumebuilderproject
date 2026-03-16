@@ -1,9 +1,9 @@
 import 'package:adminresume/routing/routes.dart';
-import 'package:adminresume/ui/dashboard.dart';
-import 'package:adminresume/ui/login.dart';
-import 'package:adminresume/ui/signup.dart';
-import 'package:adminresume/ui/template_management.dart';
-import 'package:adminresume/ui/user_management.dart';
+import 'package:adminresume/ui/dashboard/view/dashboard.dart';
+import 'package:adminresume/ui/login/view/login.dart';
+import 'package:adminresume/ui/signup/view/signup.dart';
+import 'package:adminresume/ui/template/view/template_management.dart';
+import 'package:adminresume/ui/user/view/user_management.dart';
 import 'package:go_router/go_router.dart';
 
 GoRouter router = GoRouter(
