@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "259797291790",
+    "project_id": "resumerbuilder-ad4cd",
+    "storage_bucket": "resumerbuilder-ad4cd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259797291790:android:7585f566fd9c5a217b7d5f",
+        "android_client_info": {
+          "package_name": "com.example.adminresume"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyylwbCZ9VOSvvvsESDI25REYgk4eM540"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259797291790:android:636de237c23ef3547b7d5f",
+        "android_client_info": {
+          "package_name": "com.example.resumerbuilder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyylwbCZ9VOSvvvsESDI25REYgk4eM540"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

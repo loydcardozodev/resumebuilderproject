@@ -3,6 +3,7 @@ import 'package:adminresume/ui/dashboard/viewmodel/dashboard_viewmodel.dart';
 import 'package:adminresume/ui/template/view/template_management.dart';
 import 'package:adminresume/ui/user/view/user_management.dart';
 import 'package:adminresume/ui/viewmodel/auth_viewmodel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -136,11 +137,64 @@ class _DashboardHomeState extends State<DashboardHome> {
                   'Dashboard',
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(
-                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDegSnM1BupqlLkwOfnzKYPM7Hdkl3nvtmQw&s',
-                  ),
+
+                // Inside _DashboardHomeState's build, replace the CircleAvatar in the Row:
+                // In dashboard.dart — replace the CircleAvatar in the header Row with this:
+                Builder(
+                  builder: (context) {
+                    final user = FirebaseAuth.instance.currentUser;
+                    final photoUrl = user?.photoURL;
+                    final name = user?.displayName ?? 'Admin';
+                    final initials = () {
+                      final parts = name.trim().split(' ');
+                      if (parts.length >= 2)
+                        return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+                      return parts[0].isNotEmpty
+                          ? parts[0][0].toUpperCase()
+                          : 'A';
+                    }();
+
+                    return GestureDetector(
+                      onTap: () => context.push(Routes.profile),
+                      child: photoUrl != null && photoUrl.isNotEmpty
+                          ? CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.grey.shade200,
+                              child: ClipOval(
+                                child: Image.network(
+                                  photoUrl,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.blue.shade100,
+                                    child: Text(
+                                      initials,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue.shade800,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.blue.shade100,
+                              child: Text(
+                                initials,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue.shade800,
+                                ),
+                              ),
+                            ),
+                    );
+                  },
                 ),
               ],
             ),
