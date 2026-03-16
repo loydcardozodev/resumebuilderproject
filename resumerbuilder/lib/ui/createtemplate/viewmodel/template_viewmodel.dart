@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:resumerbuilder/data/models/resume_template/resume_template.dart';
 import 'package:resumerbuilder/data/repository/template_repository/template_repository.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 class TemplateViewModel extends ChangeNotifier {
   TemplateViewModel(this._repo);
@@ -23,11 +23,11 @@ class TemplateViewModel extends ChangeNotifier {
     final result = await _repo.getTemplates();
 
     switch (result) {
-      case Success<List<ResumeTemplate>>():
+      case Ok<List<ResumeTemplate>>():
         templates = result.value;
         selected ??= templates.isNotEmpty ? templates.first : null;
-      case Failure<List<ResumeTemplate>>():
-        errorMessage = result.message;
+      case Error<List<ResumeTemplate>>():
+        errorMessage = result.error.toString();
     }
 
     isLoading = false;

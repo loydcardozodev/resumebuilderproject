@@ -3,7 +3,7 @@ import 'package:resumerbuilder/data/models/app_user/app_user.dart';
 import 'package:resumerbuilder/data/repository/auth/auth_repository.dart';
 import 'package:resumerbuilder/data/services/firebase/firebase_profile_service.dart';
 import 'package:resumerbuilder/data/services/local/local_profile_service.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   ProfileViewModel(this._authRepo, this._profileService);
@@ -58,12 +58,12 @@ class ProfileViewModel extends ChangeNotifier {
     isSaving = false;
 
     switch (result) {
-      case Success<void>():
+      case Ok<void>():
         profile = profile?.copyWith(name: name, email: email);
         notifyListeners();
         return true;
-      case Failure<void>():
-        errorMessage = result.message;
+      case Error<void>():
+        errorMessage = result.error.toString();
         notifyListeners();
         return false;
     }
@@ -73,7 +73,7 @@ class ProfileViewModel extends ChangeNotifier {
 
   Future<bool> logout() async {
     final result = await _authRepo.logout();
-    if (result is Success) {
+    if (result is Ok) {
       profile = null;
       notifyListeners();
       return true;
@@ -85,7 +85,7 @@ class ProfileViewModel extends ChangeNotifier {
 
   Future<bool> deleteAccount(String uid) async {
     final result = await _authRepo.deleteAccount(uid);
-    if (result is Success) {
+    if (result is Ok) {
       profile = null;
       notifyListeners();
       return true;

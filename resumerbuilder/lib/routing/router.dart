@@ -50,7 +50,7 @@ GoRouter router = GoRouter(
     ),
     GoRoute(
       path: Routes.preview,
-      builder: (context, state) => const Resumepreview(),
+      builder: (context, state) => const ResumePreview(),
     ),
     GoRoute(
       path: Routes.personalData,

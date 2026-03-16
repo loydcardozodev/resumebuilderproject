@@ -1,7 +1,7 @@
 import 'package:resumerbuilder/data/models/resume/resume.dart';
 import 'package:resumerbuilder/data/repository/resume_repository/resume_repository.dart';
 import 'package:resumerbuilder/data/services/local/local_resume_service.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 class LocalResumeRepository implements ResumeRepository {
   LocalResumeRepository({required LocalResumeService service})
@@ -13,9 +13,9 @@ class LocalResumeRepository implements ResumeRepository {
   Future<Result<List<Resume>>> getResumes(String uid) async {
     try {
       final resumes = await _service.getResumes(uid);
-      return Success(resumes);
+      return Result.ok(resumes);
     } catch (e) {
-      return Failure(e.toString());
+      return Result.error(Exception(e.toString()));
     }
   }
 
@@ -23,9 +23,9 @@ class LocalResumeRepository implements ResumeRepository {
   Future<Result<Resume>> saveResume(String uid, Resume resume) async {
     try {
       final saved = await _service.saveResume(uid, resume);
-      return Success(saved);
+      return Result.ok(saved);
     } catch (e) {
-      return Failure(e.toString());
+      return Result.error(Exception(e.toString()));
     }
   }
 
@@ -33,9 +33,9 @@ class LocalResumeRepository implements ResumeRepository {
   Future<Result<void>> deleteResume(String uid, String resumeId) async {
     try {
       await _service.deleteResume(uid, resumeId);
-      return const Success(null);
+      return const Result.ok(null);
     } catch (e) {
-      return Failure(e.toString());
+      return Result.error(Exception(e.toString()));
     }
   }
 }

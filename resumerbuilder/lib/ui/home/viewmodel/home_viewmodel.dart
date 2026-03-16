@@ -38,11 +38,11 @@ class HomeViewModel extends ChangeNotifier {
     final result = await _repo.deleteResume(uid, resumeId);
 
     switch (result) {
-      case Ok<Null>():
+      case Ok<void>():
         resumes = resumes.where((r) => r.id != resumeId).toList();
         notifyListeners();
         return true;
-      case Error<Null>():
+      case Error<void>():
         error = result.error;
         notifyListeners();
         return false;

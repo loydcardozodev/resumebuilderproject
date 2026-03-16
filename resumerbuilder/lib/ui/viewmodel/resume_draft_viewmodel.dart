@@ -6,7 +6,7 @@ import 'package:resumerbuilder/data/models/education_entry/education_entry.dart'
 import 'package:resumerbuilder/data/models/project_entry/project_entry.dart';
 import 'package:resumerbuilder/data/models/reference_entry/reference_entry.dart';
 import 'package:resumerbuilder/data/repository/resume_repository/resume_repository.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 class ResumeDraftViewModel extends ChangeNotifier {
   ResumeDraftViewModel(this._repo);
@@ -18,8 +18,6 @@ class ResumeDraftViewModel extends ChangeNotifier {
   bool isLoading = false;
   bool isSaving = false;
   String? errorMessage;
-
-  // ── Called by each page ViewModel on Next ─────────────────────────────────
 
   void updatePersonalInfo(PersonalInfo info) {
     draft = draft.copyWith(personalInfo: info);
@@ -76,10 +74,10 @@ class ResumeDraftViewModel extends ChangeNotifier {
     final result = await _repo.getResumes(uid);
 
     switch (result) {
-      case Success<List<Resume>>():
+      case Ok<List<Resume>>():
         resumes = result.value;
-      case Failure<List<Resume>>():
-        errorMessage = result.message;
+      case Error<List<Resume>>():
+        errorMessage = result.error.toString();
     }
 
     isLoading = false;
@@ -96,7 +94,7 @@ class ResumeDraftViewModel extends ChangeNotifier {
     isSaving = false;
 
     switch (result) {
-      case Success<Resume>():
+      case Ok<Resume>():
         draft = result.value;
         final index = resumes.indexWhere((r) => r.id == draft.id);
         if (index >= 0) {
@@ -106,8 +104,8 @@ class ResumeDraftViewModel extends ChangeNotifier {
         }
         notifyListeners();
         return true;
-      case Failure<Resume>():
-        errorMessage = result.message;
+      case Error<Resume>():
+        errorMessage = result.error.toString();
         notifyListeners();
         return false;
     }
@@ -115,7 +113,7 @@ class ResumeDraftViewModel extends ChangeNotifier {
 
   Future<bool> deleteResume(String uid, String resumeId) async {
     final result = await _repo.deleteResume(uid, resumeId);
-    if (result is Success) {
+    if (result is Ok) {
       resumes = resumes.where((r) => r.id != resumeId).toList();
       notifyListeners();
       return true;

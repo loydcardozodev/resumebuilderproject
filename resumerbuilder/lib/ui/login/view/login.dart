@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:resumerbuilder/routing/routes.dart';
-import 'package:resumerbuilder/ui/login/login_viewmodel.dart';
+import 'package:resumerbuilder/ui/login/viewmodel/login_viewmodel.dart';
 import 'package:resumerbuilder/ui/widget/labeled_text_field.dart';
 
 class Login extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:resumerbuilder/data/models/resume/resume.dart';
-import 'package:resumerbuilder/ui/widget/result.dart';
+import 'package:resumerbuilder/util/result.dart';
 
 abstract class ResumeRepository {
   Future<Result<List<Resume>>> getResumes(String uid);
